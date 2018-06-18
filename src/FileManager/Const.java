@@ -3,9 +3,10 @@ package FileManager;
 import java.io.*;
 
 public class Const {
-    public static String rootPath = "D:\\Documents\\GitHub\\File-manager\\src\\FileManager";
-    public static String poolPath;
-    public static String content = readToString(rootPath+"\\config.json");
+    public final static String rootPath = "D:\\Documents\\GitHub\\File-manager\\src\\FileManager";
+//    public final static String poolPath;
+    public final static String content = readToString(rootPath + "\\config.json");
+    public final static String pool = rootPath + "\\pool";
 
     private static String readToString(String fileName) {
         String encoding = "UTF-8";

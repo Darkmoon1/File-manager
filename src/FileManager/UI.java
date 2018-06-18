@@ -9,101 +9,111 @@ import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 
 public class UI extends JFrame {
 
     DefaultMutableTreeNode treeRoot;
-    Container container;
+    DefaultTreeModel model;
+
+    JButton addNewFile;
+    JButton deleteFile;
+    JButton addNewClass;
+    JButton deleteClass;
+
 
     public UI(DefaultMutableTreeNode treeNode){
 
         treeRoot = treeNode;
         final JTree tree = new JTree(treeRoot);
-//        tree.addTreeSelenectionListener(new TreeListener());
-        tree.addMouseListener(new TreeListener(tree));
-        JScrollPane scrolltree = new JScrollPane(tree);
-        scrolltree.setPreferredSize(new Dimension(200, 300));
+        tree.addTreeSelectionListener(new TreeListener(tree));
+
+        model = new DefaultTreeModel(treeRoot);
+
+        JScrollPane scrollTreePane = new JScrollPane(tree);
+        scrollTreePane.setPreferredSize(new Dimension(200, 720));
 
         JTable jTable = new JTable();
         JScrollPane scrollTable = new JScrollPane(jTable);
         scrollTable.setPreferredSize(new Dimension(500, 500));
-//        jTable.setPreferredSize(new Dimension(360,360));
+
+        JPanel toolBar = new JPanel(new GridLayout(1,4,20,10));
+        addNewFile = new JButton("添加新文件");
+        addNewFile.addActionListener(new addNewFileListener());
+        deleteFile = new JButton("删除文件");
+        deleteFile.addActionListener(new deleteFileListener());
+        addNewClass = new JButton("新增分类");
+        addNewClass.addActionListener(new addNewClassListener());
+        deleteClass = new JButton("删除分类");
+        deleteClass.addActionListener(new deleteClassListener());
+        toolBar.add(addNewFile);
+        toolBar.add(deleteFile);
+        toolBar.add(addNewClass);
+        toolBar.add(deleteClass);
+        JPanel toolBarPane = new JPanel();
+        toolBarPane.add(BorderLayout.NORTH,toolBar);
+        toolBarPane.add(scrollTable);
+        toolBarPane.setPreferredSize(new Dimension(500,720));
+        toolBarPane.setBackground(Color.DARK_GRAY);
 
         JFrame f = new JFrame("JTreeDemo");
-        f.add(BorderLayout.WEST, scrolltree);
-        f.add(BorderLayout.CENTER, scrollTable);
+        f.add(BorderLayout.WEST, scrollTreePane);
+        f.add(BorderLayout.EAST,toolBarPane);
 
         //将容器外部特性实例化
-        f.setTitle("JPanel面板的案例");
-        f.setSize(720,720);//设窗体的大小     宽和高
+        f.setTitle("FileManager");
+        f.setSize(700,720);//设窗体的大小     宽和高
         f.setVisible(true);//设定窗体的可视化
         //设置窗体的关闭方式
         f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     }
 
 
-    public  DefaultMutableTreeNode getChildrenFiles(String parentName,DefaultMutableTreeNode parentNode){
-
-        JSONObject jsonObject;
-        JSONArray jsonArray;
-
-        try {
-            jsonObject = new JSONObject(Const.content);
-            jsonArray = jsonObject.getJSONArray(parentName);
-            if (jsonArray==null){
-                return parentNode;
-            }
-            for (int i = 0;i< jsonArray.length();i++){
-                parentNode.add(new DefaultMutableTreeNode(jsonArray.getString(i)));
-            }
-            return parentNode;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return parentNode;
-    }
 
 
-    class TreeListener implements MouseListener {
+
+    class TreeListener implements TreeSelectionListener {
         JTree f;
         public TreeListener(JTree tree){
             f = tree;
         }
         @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getSource()==f&&e.getClickCount()==2){
-                TreePath selPath = f.getPathForLocation(e.getX(),e.getY());
-                if (selPath!=null){
-                    DefaultMutableTreeNode parentNode = (DefaultMutableTreeNode)selPath.getLastPathComponent();
-                    if (parentNode.getChildCount()>1)
-                        parentNode  = getChildrenFiles(parentNode.toString(),parentNode);
-
-                }
-
-            }
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
+        public void valueChanged(TreeSelectionEvent e) {
 
         }
+    }
+
+    class addNewFileListener implements ActionListener{
 
         @Override
-        public void mouseReleased(MouseEvent e) {
+        public void actionPerformed(ActionEvent e) {
 
         }
+    }
+
+    class deleteFileListener implements ActionListener{
 
         @Override
-        public void mouseEntered(MouseEvent e) {
+        public void actionPerformed(ActionEvent e) {
 
         }
+    }
+    class addNewClassListener implements ActionListener{
 
         @Override
-        public void mouseExited(MouseEvent e) {
+        public void actionPerformed(ActionEvent e) {
+
+        }
+    }
+    class deleteClassListener implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
 
         }
     }
