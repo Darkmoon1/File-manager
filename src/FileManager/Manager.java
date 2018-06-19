@@ -17,7 +17,7 @@ public class Manager extends JFrame {
     private JSONObject catelog;
 
     public Manager(){
-        ui = new UI(GetFileTracer());
+        ui = new UI(GetFileTracer(),catelog);
     }
 
     public DefaultMutableTreeNode GetFileTracer(){
@@ -31,15 +31,20 @@ public class Manager extends JFrame {
         Iterator<String> iterator;
         iterator = catelog.keys();
         while (iterator.hasNext()){
-            String key = iterator.next();
-            DefaultMutableTreeNode sonNode = new DefaultMutableTreeNode(key);
+            MyFile sonNodeFile = new MyFile();
+            sonNodeFile.key = iterator.next();
+            DefaultMutableTreeNode sonNode = new DefaultMutableTreeNode(sonNodeFile);
             try {
-                JSONArray jsonArray = catelog.getJSONArray(key);
+                JSONArray jsonArray = catelog.getJSONArray(sonNodeFile.key);
                 if (jsonArray==null){
                     continue;
                 }
                 for (int i = 0;i< jsonArray.length();i++){
-                    sonNode.add(new DefaultMutableTreeNode(jsonArray.getString(i)));
+                    MyFile one = new MyFile();
+                    one.key = jsonArray.getJSONObject(i).keys().next().toString();
+                    one.path = jsonArray.getJSONObject(i).getString(one.key);
+                    sonNode.add(new DefaultMutableTreeNode(one));
+
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -52,27 +57,6 @@ public class Manager extends JFrame {
     }
 
 
-//    public  DefaultMutableTreeNode getChildrenFiles(String parentNode){
-//
-//        JSONObject jsonObject;
-//        JSONArray jsonArray;
-//
-//        try {
-//            jsonObject = new JSONObject(Const.content);
-//            jsonArray = jsonObject.getJSONArray(parentNode.toString());
-//            if (jsonArray==null){
-//                return parentNode;
-//            }
-//            for (int i = 0;i< jsonArray.length();i++){
-//                parentNode.add(new DefaultMutableTreeNode(jsonArray.getString(i)));
-//            }
-//            scrolltree.updateUI();
-//            return parentNode;
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//        return parentNode;
-//    }
 
 
 }
