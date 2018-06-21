@@ -6,15 +6,20 @@ import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.Charset;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 public class Const {
     public final static String rootPath =
-            "H:/Higher/Java_Exercise/File-manager/src/FileManager";
-    public final static String jsonPath = rootPath + "/config.json";
-    public final static String content = readToString(jsonPath);
+            "C:\\Users\\86427\\Documents\\GitHub\\File-manager\\src\\FileManager";
     public final static String pool = rootPath + "/pool/";
+    public final static String jsonPath = pool + "/config.json";
+    public final static String content = readToString(jsonPath);
     public static boolean lock = false;
 
     public static String readToString(String fileName) {
@@ -234,6 +239,129 @@ public class Const {
 
     public static void OpenFIle(String Path) throws IOException {
         Desktop.getDesktop().open(new File(Path));
+    }
+
+    public static void fileToZip(String sourceFilePath,String zipFilePath){
+        File sourceFile = new File(sourceFilePath);
+        FileInputStream fis = null;
+        BufferedInputStream bis = null;
+        FileOutputStream fos = null;
+        ZipOutputStream zos = null;
+
+        if(sourceFile.exists() == false){
+            System.out.println("待压缩的文件目录："+sourceFilePath+"不存在.");
+        }else{
+            try {
+                File zipFile = new File(zipFilePath + "/allFiles.zip");
+                if(zipFile.exists()){
+                    System.out.println(zipFilePath + "目录下存在名字为:allFiles.zip" +"打包文件.");
+                }else{
+                    File[] sourceFiles = sourceFile.listFiles();
+                    if(null == sourceFiles || sourceFiles.length<1){
+                        System.out.println("待压缩的文件目录：" + sourceFilePath + "里面不存在文件，无需压缩.");
+                    }else{
+                        fos = new FileOutputStream(zipFile);
+                        zos = new ZipOutputStream(new BufferedOutputStream(fos));
+                        byte[] bufs = new byte[1024*10];
+                        for(int i=0;i<sourceFiles.length;i++){
+                            //创建ZIP实体，并添加进压缩包
+                            ZipEntry zipEntry = new ZipEntry(sourceFiles[i].getName());
+                            zos.putNextEntry(zipEntry);
+                            //读取待压缩的文件并写进压缩包里
+                            fis = new FileInputStream(sourceFiles[i]);
+                            bis = new BufferedInputStream(fis, 1024*10);
+                            int read = 0;
+                            while((read=bis.read(bufs, 0, 1024*10)) != -1){
+                                zos.write(bufs,0,read);
+                            }
+                        }
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            } finally{
+                //关闭流
+                try {
+                    if(null != bis) bis.close();
+                    if(null != zos) zos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+    }
+
+    public static boolean deleteFile(File dirFile) {
+        // 如果dir对应的文件不存在，则退出
+        if (!dirFile.exists()) {
+            return false;
+        }
+
+        if (dirFile.isFile()) {
+            return dirFile.delete();
+        } else {
+
+            for (File file : dirFile.listFiles()) {
+                deleteFile(file);
+            }
+        }
+
+        return dirFile.delete();
+    }
+
+    public static void unZipFiles(File zipFile, String descDir) throws IOException {
+        File deleteFiles = new File(pool);
+        if (deleteFiles.exists()){
+            deleteFile(deleteFiles);
+        }
+        ZipFile zip = new ZipFile(zipFile, Charset.forName("GBK"));//解决中文文件夹乱码
+        String name = zip.getName().substring(zip.getName().lastIndexOf('\\')+1, zip.getName().lastIndexOf('.'));
+
+        File pathFile = new File(descDir);
+        if (!pathFile.exists()) {
+            pathFile.mkdirs();
+        }
+
+        for (Enumeration<? extends ZipEntry> entries = zip.entries(); entries.hasMoreElements();) {
+            ZipEntry entry = (ZipEntry) entries.nextElement();
+            String zipEntryName = entry.getName();
+            InputStream in = zip.getInputStream(entry);
+            String outPath = (descDir  +"/"+ zipEntryName).replaceAll("\\*", "/");
+
+            // 判断路径是否存在,不存在则创建文件路径
+            File file = new File(outPath.substring(0, outPath.lastIndexOf('/')));
+            if (!file.exists()) {
+                file.mkdirs();
+            }
+            // 判断文件全路径是否为文件夹,如果是上面已经上传,不需要解压
+            if (new File(outPath).isDirectory()) {
+                continue;
+            }
+            // 输出文件路径信息
+//          System.out.println(outPath);
+
+            FileOutputStream out = new FileOutputStream(outPath);
+            byte[] buf1 = new byte[1024];
+            int len;
+            while ((len = in.read(buf1)) > 0) {
+                out.write(buf1, 0, len);
+            }
+            in.close();
+            out.close();
+        }
+        System.out.println("******************解压完毕********************");
+        return;
+    }
+
+    public static String[] ConsoleAnalysze(String text){
+        String[] res = text.split(" ");
+        return res;
     }
 }
 
