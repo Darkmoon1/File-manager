@@ -7,19 +7,20 @@ import org.json.JSONObject;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.Charset;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Vector;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Const {
     public final static String rootPath =
-            "C:\\Users\\86427\\Documents\\GitHub\\File-manager\\src\\FileManager";
+            "./src/FileManager";
     public final static String pool = rootPath + "/pool/";
     public final static String jsonPath = pool + "/config.json";
     public final static String content = readToString(jsonPath);
+    public final static String BakeFile = rootPath+"/BakeFile/";
     public static boolean lock = false;
 
     public static String readToString(String fileName) {
@@ -247,14 +248,16 @@ public class Const {
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
         ZipOutputStream zos = null;
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
 
         if(sourceFile.exists() == false){
             System.out.println("待压缩的文件目录："+sourceFilePath+"不存在.");
         }else{
             try {
-                File zipFile = new File(zipFilePath + "/allFiles.zip");
+                File zipFile = new File(zipFilePath + "/allFiles" + sdf.format(d) + ".bake");
                 if(zipFile.exists()){
-                    System.out.println(zipFilePath + "目录下存在名字为:allFiles.zip" +"打包文件.");
+                    System.out.println(zipFilePath + "目录下存在名字为:" + zipFile.getName() +"打包文件.");
                 }else{
                     File[] sourceFiles = sourceFile.listFiles();
                     if(null == sourceFiles || sourceFiles.length<1){
@@ -296,6 +299,7 @@ public class Const {
         }
 
     }
+
 
     public static boolean deleteFile(File dirFile) {
         // 如果dir对应的文件不存在，则退出
@@ -363,5 +367,51 @@ public class Const {
         String[] res = text.split(" ");
         return res;
     }
+
+    public static void sortJsonArray(String key){
+        class JsonComparator implements Comparator<JSONObject> {
+
+            @Override
+            public int compare(JSONObject json1, JSONObject json2){
+                String key1 = json1.keys().next().toString();
+                String key2 = json2.keys().next().toString();
+                if(key1.compareTo(key2) < 0){
+                    return 1;
+                }else if(key1.compareTo(key2) >0){
+                    return -1;
+                }
+                return 0;
+            }
+        }
+        try {
+            JSONObject jsonObject = new JSONObject(readToString(jsonPath));
+            JSONArray mJSONArray = jsonObject.getJSONArray(key);
+            List<JSONObject> list = new ArrayList<JSONObject> ();
+            JSONObject jsonObj = null;
+            for (int i = 0; i < mJSONArray.length(); i++) {
+                jsonObj = mJSONArray.optJSONObject(i);
+                list.add(jsonObj);
+            }
+            //排序操作
+            JsonComparator pComparator =  new JsonComparator();
+            Collections.sort(list, pComparator);
+
+            //把数据放回去
+            mJSONArray = new JSONArray();
+            for (int i = 0; i < list.size(); i++) {
+                jsonObj = list.get(i);
+                mJSONArray.put(jsonObj);
+            }
+
+            jsonObject.remove(key);
+            jsonObject.put(key,mJSONArray);
+            String newJson = jsonObject.toString();
+            SaveDataToFile(newJson);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
 

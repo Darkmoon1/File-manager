@@ -12,7 +12,7 @@ public class JTextFieldHintListener implements FocusListener {
     public JTextFieldHintListener(String hintText, JTextField textField) {
         this.mHintText = hintText;
         this.mTextField = textField;
-        textField.setForeground(Color.GRAY);
+        textField.setForeground(Color.BLACK);
     }
     @Override
     public void focusGained(FocusEvent e) {
@@ -26,7 +26,7 @@ public class JTextFieldHintListener implements FocusListener {
     public void focusLost(FocusEvent e) {
         String temp = mTextField.getText();
         if(temp.equals("")){
-            mTextField.setForeground(Color.GRAY);
+            mTextField.setForeground(Color.BLACK);
             mTextField.setText(mHintText);
         }
     }

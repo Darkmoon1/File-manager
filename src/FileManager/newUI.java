@@ -12,6 +12,7 @@ import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.DefaultCaret;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -40,6 +41,7 @@ public class newUI {
   private JTable InfoTable;
   private JScrollPane ConsoleSArea;
   private JPanel ConsoleArea;
+  private JPanel ConsoleMainArea;
 
   String hint =  "> ";
   DefaultMutableTreeNode treeRoot;
@@ -63,6 +65,14 @@ public class newUI {
   private Icon addClassPressIcon = new ImageIcon("./img/addClassPress.png");
   private Icon deleteClassIcon = new ImageIcon("./img/deleteClass.png");
   private Icon deleteClassPressIcon = new ImageIcon("./img/deleteClassPress.png");
+  private Icon openFileIcon = new ImageIcon("./img/openFile.png");
+  private Icon openFilePressIcon = new ImageIcon("./img/openFilePress.png");
+  private Icon uploadIcon = new ImageIcon("./img/upload.png");
+  private Icon uploadPressIcon = new ImageIcon("./img/uploadPress.png");
+  private Icon downloadIcon = new ImageIcon("./img/download.png");
+  private Icon downloadPressIcon = new ImageIcon("./img/downloadPress.png");
+  private Icon searchIcon = new ImageIcon("./img/search.png");
+  private Icon searchPressIcon = new ImageIcon("./img/searchPress.png");
 
   public void RefreshTree(){
     treeRoot.removeAllChildren();
@@ -134,6 +144,7 @@ public class newUI {
     mainFrame.setLayout(new GridBagLayout());
     mainFrame.setSize(1200,700);
     mainFrame.setLocationRelativeTo(null);
+    mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     mainFrame.addWindowListener(new WindowAdapter() {
       public void windowClosing(WindowEvent windowEvent){
         System.exit(0);
@@ -152,10 +163,10 @@ public class newUI {
     deleteFile = new JButton();
     addClass = new JButton();
     deleteClass = new JButton();
-    openFile = new JButton("打开文件");
-    save = new JButton("备份");
-    load = new JButton("还原");
-    searchButton = new JButton("搜索");
+    openFile = new JButton();
+    save = new JButton();
+    load = new JButton();
+    searchButton = new JButton();
     search = new JTextField();
     search.setFont(new Font("宋体", Font.PLAIN, 19) );
     ToolBar.add(addFile,new GBC(0,0).setInsets(0,20,0,5).setWeight(1,0));
@@ -195,6 +206,30 @@ public class newUI {
     deleteClass.setBorderPainted(false);
     deleteClass.setContentAreaFilled(false);
 
+    openFile.setIcon(openFileIcon);
+    openFile.setPressedIcon(openFilePressIcon);
+    openFile.setBorder(emptyBorder);
+    openFile.setBorderPainted(false);
+    openFile.setContentAreaFilled(false);
+
+    save.setIcon(uploadIcon);
+    save.setPressedIcon(uploadPressIcon);
+    save.setBorder(emptyBorder);
+    save.setBorderPainted(false);
+    save.setContentAreaFilled(false);
+
+    load.setIcon(downloadIcon);
+    load.setPressedIcon(downloadPressIcon);
+    load.setBorder(emptyBorder);
+    load.setBorderPainted(false);
+    load.setContentAreaFilled(false);
+
+    searchButton.setIcon(searchIcon);
+    searchButton.setPressedIcon(searchPressIcon);
+    searchButton.setBorder(emptyBorder);
+    searchButton.setBorderPainted(false);
+    searchButton.setContentAreaFilled(false);
+
 
 
     /**
@@ -221,18 +256,23 @@ public class newUI {
      */
 
 
+    ConsoleMainArea = new JPanel(new GridBagLayout());
     ConsolePlay = new JTextArea();
     Console = new JTextField();
     ConsolePlay.setEditable(false);
-    Console.setFont(new Font("宋体", Font.PLAIN, 19));
+    Console.setFont(new Font("Times New Roman", Font.PLAIN, 19));
     Console.setBorder(emptyBorder);
-    ConsolePlay.setFont(new Font("宋体", Font.PLAIN, 19));
+    ConsolePlay.setFont(new Font("宋体", Font.PLAIN, 15));
     ConsoleArea = new JPanel(new GridBagLayout());
-    ConsoleArea.add(ConsolePlay,new GBC(0,1).setIpad(1100,160).setWeight(100,100).setFill(GBC.BOTH));
-    ConsoleArea.add(Console,new GBC(0,0).setIpad(1100,0).setWeight(100,100).setFill(GBC.BOTH));
+    DefaultCaret caret =(DefaultCaret)Console.getCaret();
+    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+    ConsoleArea.add(ConsolePlay,new GBC(0,0).setIpad(1100,160).setWeight(100,100).setFill(GBC.BOTH));
+    ConsoleMainArea.add(Console,new GBC(0,0).setIpad(1100,20).setWeight(100,0).setFill(GBC.BOTH));
     ConsoleSArea = new JScrollPane(ConsoleArea);
-    mainFrame.add(ConsoleSArea,new GBC(1,2,1,1).setIpad(1100,300).setWeight(100,100).setFill(GBC.BOTH));
-
+    ConsoleSArea.setBorder(emptyBorder);
+    ConsoleMainArea.add(ConsoleSArea,new GBC(0,1).setIpad(1100,0).setWeight(100,100).setFill(GBC.BOTH));
+    mainFrame.add(ConsoleMainArea,new GBC(1,2,1,1).setIpad(1100,300).setWeight(100,100).setFill(GBC.BOTH));
+    mainFrame.setVisible(true);
 
     /**
      * 监听
@@ -308,7 +348,7 @@ public class newUI {
             jd.dispose();
           }
         });
-        contentPane.add(confirmButton,new GBC(1,5,1,1).setIpad(0,0).setWeight(0,0).setFill(GBC.NONE));
+        contentPane.add(confirmButton,new GBC(1,5,1,1).setIpad(0,0).setWeight(0,0).setFill(GBC.NONE).setInsets(15,0,15,0));
         jd.setModal(true);//确保弹出的窗口在其他窗口前面
         jd.setVisible(true);
       }
@@ -421,7 +461,7 @@ public class newUI {
     save.addActionListener(new ActionListener() {                //备份文件的监听接口
       @Override
       public void actionPerformed(ActionEvent e) {
-        Const.fileToZip(Const.pool,Const.rootPath);
+        Const.fileToZip(Const.pool,Const.BakeFile);
         ConsolePlay.append("******************压缩完毕********************\n备份成功\n");
       }
     });
@@ -429,19 +469,27 @@ public class newUI {
     load.addActionListener(new ActionListener() {               //还原文件的监听接口
       @Override
       public void actionPerformed(ActionEvent e) {
-        File bakeFile = new File(Const.rootPath + "/allFiles.zip");
-        if (bakeFile.exists()){
-          try {
-            Const.unZipFiles(bakeFile,Const.pool);
-            ConsolePlay.append("******************解压完毕********************\n恢复成功\n");
-            RefreshTree();
-          } catch (IOException e1) {
-            e1.printStackTrace();
+        JFileChooser loadChooser = new JFileChooser(new File("./src/FileManager/BakeFile/"));
+        loadChooser.setDialogTitle("选择备份文件");
+        loadChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        String loadPath;
+        int returnVal = loadChooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+          loadPath = loadChooser.getSelectedFile().getAbsolutePath();
+          File bakeFile = new File(loadPath);
+          if (bakeFile.exists()){
+            try {
+              Const.unZipFiles(bakeFile,Const.pool);
+              ConsolePlay.append("******************解压完毕********************\n恢复成功\n");
+              RefreshTree();
+            } catch (IOException e1) {
+              e1.printStackTrace();
+            }
+          }else {
+            ConsolePlay.append("备份不存在\n");
           }
-        }else {
-          ConsolePlay.append("备份不存在\n");
-        }
-      }
+          }
+          }
     });
 
     searchButton.addActionListener(new ActionListener() {      //搜索文件的监听接口
@@ -509,7 +557,7 @@ public class newUI {
       }
     });
 
-    Console.addFocusListener(new JTextFieldHintListener(hint,Console));
+    Console.addFocusListener(new JTextFieldHintListener(hint,Console));   //控制台监听
 
     Console.addKeyListener(new KeyListener() {
       @Override
@@ -555,10 +603,39 @@ public class newUI {
               ConsolePlay.setText(null);
             }
             break;
-              default:{
-                ConsolePlay.append("不存在该命令: " + keys[0] + "\n");
+
+            case "bake":{
+              save.doClick();
+            }
+            break;
+
+            case "download":{
+              load.doClick();
+            }
+            break;
+            case "sort":{
+              if (keys.length<2){
+                ConsolePlay.append("请输入排序分类\n");
+                return;
               }
-              break;
+              try {
+                if (catelog.getJSONArray(keys[1]) != null){
+                  Const.sortJsonArray(keys[1]);
+                  RefreshTree();
+                  ConsolePlay.append("排序成功\n");
+                }else {
+                  ConsolePlay.append("无效的分类\n");
+                }
+              } catch (JSONException e1) {
+                e1.printStackTrace();
+              }
+            }
+            break;
+
+            default:{
+              ConsolePlay.append("不存在该命令: " + keys[0] + "\n");
+            }
+            break;
           }
         }
       }
@@ -568,6 +645,27 @@ public class newUI {
 
       }
     });
+
+
+    search.addKeyListener(new KeyListener() {
+      @Override
+      public void keyTyped(KeyEvent e) {
+
+      }
+
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.getKeyChar() == KeyEvent.VK_ENTER) {
+          searchButton.doClick();
+        }
+      }
+
+      @Override
+      public void keyReleased(KeyEvent e) {
+
+      }
+    });
+
 
 
 
