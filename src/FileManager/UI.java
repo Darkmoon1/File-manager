@@ -254,7 +254,8 @@ public class UI extends JFrame {
             DefaultMutableTreeNode selectnode = (DefaultMutableTreeNode) path
                     .getLastPathComponent();
             if (selectnode.isLeaf()) {
-                Const.ClearFile(((MyFile)selectnode.getUserObject()).path,((MyFile)selectnode.getUserObject()).key);
+                Const.ClearFile(((MyFile)selectnode.getUserObject()).path,selectnode
+                        .getUserObjectPath());
             } else {
                 outConsole.append("请选择文件\n");
                 return;

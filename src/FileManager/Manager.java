@@ -13,11 +13,11 @@ import java.io.*;
 import java.util.Iterator;
 
 public class Manager extends JFrame {
-    private UI ui;
+    private newUI ui;
     private JSONObject catelog;
 
     public Manager(){
-        ui = new UI(GetFileTracer(),catelog);
+        ui = new newUI(GetFileTracer(),catelog);
     }
 
     public DefaultMutableTreeNode GetFileTracer(){

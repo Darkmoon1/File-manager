@@ -6,12 +6,15 @@ import org.json.JSONObject;
 
 import java.awt.*;
 import java.io.*;
+import java.util.Iterator;
+import java.util.Vector;
 
 public class Const {
-    public final static String rootPath = "C:\\Users\\86427\\Documents\\GitHub\\File-manager\\src\\FileManager";
-    public final static String jsonPath = rootPath + "\\config.json";
+    public final static String rootPath =
+            "H:/Higher/Java_Exercise/File-manager/src/FileManager";
+    public final static String jsonPath = rootPath + "/config.json";
     public final static String content = readToString(jsonPath);
-    public final static String pool = rootPath + "\\pool\\";
+    public final static String pool = rootPath + "/pool/";
     public static boolean lock = false;
 
     public static String readToString(String fileName) {
@@ -164,25 +167,68 @@ public class Const {
         }
     }
 
-    public static void ClearFile (String fileName,String keys)
+    public static void ClearFile (String fileName,Object[] path)
     {
+
         File file1 = new File(pool + fileName);
         try {
-            JSONObject jsonObject1 = new JSONObject(readToString(jsonPath));
-            jsonObject1.remove(keys);
+            JSONObject jsonObject = new JSONObject(readToString(jsonPath));
+            JSONArray jsonArray = jsonObject.getJSONArray(((MyFile)path[1]).key);
+            for (int i = 0;i< jsonArray.length();i++) {
+                String a = jsonArray.getJSONObject(i).keys().next().toString();
+                String b = ((MyFile)path[2]).key;
+                if(a.equals(b)){
+                    jsonArray.remove(i);
+                    break;
+                }
+            }
             if (file1.exists())
             {
                 file1.delete();
             }
             else
             {
-                System.out.println("文件不存在");
+                System.out.println("文件已经被删除");
             }
+            jsonObject.remove(((MyFile)path[1]).key);
+            jsonObject.put(((MyFile)path[1]).key,jsonArray);
+            String newJson = jsonObject.toString();
+            SaveDataToFile(newJson);
         }
         catch (JSONException e)
         {
             e.printStackTrace();
         }
+    }
+    public static String SearchFile(String query){
+        String resPool = "查询内容： " + query + "\n";
+        int count = 0;
+        try {
+            JSONObject jsonObject = new JSONObject(readToString(jsonPath));
+            Iterator<String> iterator;
+            iterator = jsonObject.keys();
+            while (iterator.hasNext()){
+                String text = iterator.next();
+                if (text.contains(query)){
+                    resPool += "pool-->"+text + "\n";
+                    count++;
+                }
+                JSONArray jsonArray = jsonObject.getJSONArray(text);
+                for (int i=0;i<jsonArray.length();i++){
+                    String key = jsonArray.getJSONObject(i).keys().next().toString();
+                    if (key.contains(query)){
+                        resPool += "pool-->" + text + "-->" + key + "\n";
+                        count++;
+                    }
+                }
+            }
+        resPool += "共得到搜索结果: " + count + "\n";
+        return resPool;
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
