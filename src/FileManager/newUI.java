@@ -381,7 +381,7 @@ public class newUI {
       @Override
       public void actionPerformed(ActionEvent e) {
         JDialog jd = new JDialog();
-        jd.setBounds(320, 180, 260, 120);
+        jd.setBounds(320, 180, 300, 160);
         jd.setTitle("新建分类");
         JPanel contentPane = new JPanel(new GridBagLayout());
         contentPane.setPreferredSize(new Dimension(260,30));
@@ -402,7 +402,7 @@ public class newUI {
             jd.dispose();
           }
         });
-        contentPane.add(confirmButton,new GBC(0,1));
+        contentPane.add(confirmButton,new GBC(0,1).setInsets(15,0,15,0));
         jd.setModal(true);//确保弹出的窗口在其他窗口前面
         jd.setVisible(true);
       }
@@ -631,7 +631,42 @@ public class newUI {
               }
             }
             break;
+            case "addf":
+            case "addFile":{
+              addFile.doClick();
+            }
+            break;
+            case "df":
+            case "deleteFile":{
+              deleteFile.doClick();
+            }
+            break;
 
+            case "adc" :
+            case "addclass":
+            case "addClass" :{
+              if (keys.length <2){
+                addClass.doClick();
+              }
+              else {
+                Const.AddClassToJson(keys[1]);
+                ConsolePlay.append("添加分类成功\n");
+                RefreshTree();
+              }
+            }
+            break;
+
+            case "dc":
+            case "deleteclass":
+            case "deleteClass" :{
+              deleteClass.doClick();
+            }
+            break;
+
+            case "open":
+            case "openfile":{
+              openFile.doClick();
+            }
             default:{
               ConsolePlay.append("不存在该命令: " + keys[0] + "\n");
             }
